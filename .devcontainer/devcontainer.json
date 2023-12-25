@@ -1,0 +1,20 @@
+{
+    "build": {
+        "dockerfile": "Dockerfile"
+    },
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "bradlc.vscode-tailwindcss",
+                "heybourn.headwind",
+                "astro-build.astro-vscode",
+                "rust-lang.rust-analyzer",
+                "tamasfe.even-better-toml",
+                "esbenp.prettier-vscode"
+            ],
+            "settings": {
+                "editor.defaultFormatter": "esbenp.prettier-vscode"
+            }
+        }
+    }
+}
