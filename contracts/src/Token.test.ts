@@ -55,7 +55,7 @@ describe('token test', () => {
         tokenZkapp.circulatingSupply.getAndRequireEquals().assertEquals(UInt64.from(0))
     })
 
-    it('can minttttttttt tokens', async () => {
+    it('can mint tokens', async () => {
         const tx = await Mina.transaction(userPubkeyD, () => {
             AccountUpdate.fundNewAccount(userPubkeyD)
             tokenZkapp.mint(userPubkey, AMOUNT_MINT)

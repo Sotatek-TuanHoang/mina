@@ -1,10 +1,13 @@
 import {
     AccountUpdate,
+    Bool,
+    Circuit,
     DeployArgs,
     Experimental,
     Field,
     Int64,
     Permissions,
+    Provable,
     PublicKey,
     SmartContract,
     State,
@@ -22,7 +25,7 @@ export class Token extends SmartContract {
 
     deploy(args?: DeployArgs) {
         super.deploy(args)
-
+        // this.account.tokenSymbol.set("WETH");
         this.account.permissions.set({
             ...Permissions.default(),
             access: Permissions.proofOrSignature(),
@@ -117,12 +120,34 @@ export class Token extends SmartContract {
         balanceChange.assertEquals(Int64.from(0))
     }
 
-    // Instead, use `approveUpdate` method.
-    // @method deployZkapp(address: PublicKey, verificationKey: VerificationKey) {
-    //     let tokenId = this.token.id
-    //     let zkapp = AccountUpdate.create(address, tokenId)
-    //     zkapp.account.permissions.set(Permissions.default())
-    //     zkapp.account.verificationKey.set(verificationKey)
-    //     zkapp.requireSignature()
-    // }
+    /**
+   * 'sendTokens()' sends tokens from `senderAddress` to `receiverAddress`.
+   *
+   * It does so by deducting the amount of tokens from `senderAddress` by
+   * authorizing the deduction with a proof. It then creates the receiver
+   * from `receiverAddress` and sends the amount.
+   */
+  @method sendTokensFromZkApp(
+    receiverAddress: PublicKey,
+    amount: UInt64,
+    callback: Experimental.Callback<any>
+  ) {
+    // approves the callback which deductes the amount of tokens from the sender
+    let senderAccountUpdate = this.approve(callback);
+
+    // Create constraints for the sender account update and amount
+    let negativeAmount = Int64.fromObject(
+      senderAccountUpdate.body.balanceChange
+    );
+    negativeAmount.assertEquals(Int64.from(amount).neg());
+    let tokenId = this.token.id;
+
+    // Create receiver accountUpdate
+    let receiverAccountUpdate = Experimental.createChildAccountUpdate(
+      this.self,
+      receiverAddress,
+      tokenId
+    );
+    receiverAccountUpdate.balance.addInPlace(amount);
+  }
 }
